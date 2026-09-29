@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+  <pre id="output">Running...</pre>
+
+  <script type="module">
+    import { userFuncs, $init } from "./pkg/component.js";
+
+    if ($init) await $init;
+
+    const result = userFuncs.helloWorld("Tom");
+    document.getElementById("output").textContent = result;
+    console.log("Result from Wasm:", result);
+  </script>
+</body>
+</html>

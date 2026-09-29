@@ -1,0 +1,3 @@
+interface webtransport {
+    log: func(s: string);
+}

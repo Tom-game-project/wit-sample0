@@ -1,0 +1,12 @@
+package component:tom;
+
+interface user-funcs {
+  hello-world: func(name:string) -> string;
+}
+
+world my-world {
+  import tombind:webtransport/webtransport;
+
+  export user-funcs;
+  // export func00: func();
+}

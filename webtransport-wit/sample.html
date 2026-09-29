@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+  <canvas id="c" width="400" height="300"></canvas>
+  <script>
+    const canvas = document.getElementById("c");
+    const gl = canvas.getContext("webgl2");
+
+    // 頂点シェーダー: 外部から頂点座標 (a_position) を受け取る
+    const vsSource = `#version 300 es
+      in vec2 a_position; // CPU から渡される 2D 座標
+      void main() {
+        gl_Position = vec4(a_position, 0.0, 1.0);
+      }
+    `;
+
+    const fsSource = `#version 300 es
+      precision mediump float;
+      out vec4 fragColor;
+      void main() {
+        fragColor = vec4(0.2, 0.8, 0.4, 1.0); // 緑色
+      }
+    `;
+
+    // --- シェーダーの準備 ---
+    const vs = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vs, vsSource);
+    gl.compileShader(vs);
+
+    const fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, fsSource);
+    gl.compileShader(fs);
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+
+    // シェーダー内の 'a_position' 変数の入力スロット番号を取得
+    const posLoc = gl.getAttribLocation(program, "a_position");
+
+    // --- データの準備 (CPU -> GPU) ---
+    // 三角形の 3 頂点座標 (X, Y)
+    const positions = new Float32Array([
+       0.0,  0.5, // 頂点1: 上
+      -0.5, -0.5, // 頂点2: 左下
+       0.5, -0.5  // 頂点3: 右下
+    ]);
+
+    // 1. 設定保存器 (VAO) を作ってバインド
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    // 2. GPU 側にバッファ (VBO) を作り、データを転送
+    const vbo = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+    // 3. 「a_position 変数は、この VBO から float 2個ずつ読み出せ」と指示
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(
+      posLoc,
+      2,        // 1頂点あたりの要素数 (vec2 なので 2)
+      gl.FLOAT, // データ型
+      false,    // 正規化しない
+      0,        // ストライド (0 = 詰めて配置)
+      0         // オフセット (先頭から)
+    );
+
+    // 設定完了したのでバインド解除
+    gl.bindVertexArray(null);
+
+    // --- 描画ループ ---
+    gl.clearColor(0.1, 0.1, 0.1, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.useProgram(program);
+    gl.bindVertexArray(vao); // 保存しておいた設定を適用
+
+    // TRIANGLES モードで 3 頂点描画
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+package tombind:webtransport;
+
+world imports {
+    import webtransport;
+}

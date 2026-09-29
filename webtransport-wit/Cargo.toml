@@ -1,0 +1,17 @@
+[package]
+name = "webtransport-wit"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dlmalloc = { version = "0.2.14", features = ["global"] }
+wit-bindgen = { version = "0.62.0", default-features = false, features = ["macros", "realloc"] }
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = "s"      # サイズ最優先（"z" でも可）
+lto = true           # リンク時最適化
+codegen-units = 1
+panic = "abort"      # パニック時の巻き戻しを排除
