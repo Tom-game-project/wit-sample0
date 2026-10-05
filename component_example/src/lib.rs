@@ -10,7 +10,7 @@ struct Component;
 
 impl Guest for Component {
     /// Say hello!
-    fn hello_world(name:String) -> String {
+    fn hello_world(name: String) -> String {
         host_trait::set_name(&format!("component-user-{}", name));
         let current_name = host_trait::get_name();
         let greeting = host_trait::say_hello(&name);
